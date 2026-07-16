@@ -17,6 +17,26 @@ add_library(c12bridge_mavlink
     src/mavlink/message.cpp
 )
 
+add_library(c12bridge_platform
+    src/platform/linux_status.cpp
+)
+
+target_include_directories(c12bridge_platform PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"
+)
+
+target_include_directories(c12bridge_platform SYSTEM PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/extern/mavlink"
+)
+
+target_compile_options(c12bridge_platform PRIVATE
+    -Wall
+    -Wextra
+    -Wpedantic
+    -Wconversion
+    -Wshadow
+)
+
 target_include_directories(c12bridge_mavlink PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
@@ -37,7 +57,7 @@ add_executable(c12-bridge
     src/main.cpp
 )
 
-target_link_libraries(c12-bridge PRIVATE c12bridge_mavlink)
+target_link_libraries(c12-bridge PRIVATE c12bridge_mavlink c12bridge_platform)
 
 include(CTest)
 
@@ -51,5 +71,16 @@ if(BUILD_TESTING)
     add_test(
         NAME mavlink-message-round-trip
         COMMAND mavlink-message-test
+    )
+
+    add_executable(linux-status-test
+        tests/platform/linux_status_test.cpp
+    )
+
+    target_link_libraries(linux-status-test PRIVATE c12bridge_platform)
+
+    add_test(
+        NAME linux-status-collection
+        COMMAND linux-status-test
     )
 endif()

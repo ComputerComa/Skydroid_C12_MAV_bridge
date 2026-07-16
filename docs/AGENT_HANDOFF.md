@@ -50,6 +50,14 @@ Toolchain already installed and working:
 - VS Code Remote WSL
 - Official MAVLink `c_library_v2` headers under `extern/mavlink`
 
+Current live development is on Debian 13 under WSL2. A Pixhawk 6C connected to
+Windows through USB is bridged by MAVProxy to the WSL process over UDP port
+14551. This development route has verified bidirectional heartbeats: the bridge
+discovers aircraft system ID 1 and advertises component
+`MAV_COMP_ID_ONBOARD_COMPUTER` on that system. The bridge also sends measured
+Linux `ONBOARD_COMPUTER_STATUS` values for uptime, per-core CPU load, RAM, and
+root-filesystem usage. Raspberry Pi and TELEM-UART behavior remain unverified.
+
 The project currently builds successfully with:
 
 ```bash

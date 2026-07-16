@@ -12,6 +12,7 @@ REPO_ROOT="$(cd -- "$SCRIPT_DIR/.." && pwd)"
 
 echo "Verifying local C/C++ toolchain and library dependencies..."
 FAILED=0
+OPTIONAL_MISSING=0
 
 # Lists matching your custom environment setup
 CLI_DEPS=(
@@ -57,7 +58,38 @@ else
     echo -e "${GREEN}[OK]${NC} Submodule: MAVLink ArduPilotMega header detected"
 fi
 
-# 4. Optional Installation Prompt
+# 4. Optional Python Development Tools
+echo -e "\nVerifying optional Python development tools..."
+
+if ! command -v python3 &> /dev/null; then
+    echo -e "${YELLOW}[OPTIONAL MISSING]${NC} Python interpreter: python3"
+    OPTIONAL_MISSING=1
+else
+    echo -e "${GREEN}[OK]${NC} Python interpreter: python3"
+fi
+
+if ! command -v pipx &> /dev/null; then
+    echo -e "${YELLOW}[OPTIONAL MISSING]${NC} Python application manager: pipx"
+    OPTIONAL_MISSING=1
+else
+    echo -e "${GREEN}[OK]${NC} Python application manager: pipx"
+
+    if pipx runpip mavproxy show MAVProxy &> /dev/null; then
+        echo -e "${GREEN}[OK]${NC} pipx application: mavproxy"
+    else
+        echo -e "${YELLOW}[OPTIONAL MISSING]${NC} pipx application: mavproxy"
+        OPTIONAL_MISSING=1
+    fi
+
+    if pipx runpip mermaidx show mermaidx &> /dev/null; then
+        echo -e "${GREEN}[OK]${NC} pipx application: mermaidx"
+    else
+        echo -e "${YELLOW}[OPTIONAL MISSING]${NC} pipx application: mermaidx"
+        OPTIONAL_MISSING=1
+    fi
+fi
+
+# 5. Required Dependency Installation Prompt
 if [ $FAILED -ne 0 ]; then
     echo -e "\n${YELLOW}⚠️ Missing dependencies or submodules found.${NC}"
     read -p "Would you like to fix the workspace environment now? (y/N): " choice
@@ -97,7 +129,39 @@ if [ $FAILED -ne 0 ]; then
             exit 1
             ;;
     esac
-else
-    echo -e "\n${GREEN}🚀 Complete C/C++ workspace successfully verified!${NC}"
-    exit 0
 fi
+
+echo -e "\n${GREEN}🚀 Complete C/C++ workspace successfully verified!${NC}"
+
+# 6. Optional Python Development Installation Prompt
+if [ $OPTIONAL_MISSING -ne 0 ]; then
+    echo -e "\n${YELLOW}Optional Python development tools are missing.${NC}"
+    read -r -p "Would you like to install Python, pipx, MAVProxy, and MermaidX now? (y/N): " optional_choice
+    case "$optional_choice" in
+        [yY][eE][sS]|[yY])
+            if ! command -v python3 &> /dev/null || ! command -v pipx &> /dev/null; then
+                echo "Updating apt package index..."
+                sudo apt update
+                echo "Installing optional Python development tools..."
+                sudo apt install -y python3 pipx
+            fi
+
+            if ! pipx runpip mavproxy show MAVProxy &> /dev/null; then
+                pipx install mavproxy
+            fi
+            if ! pipx runpip mermaidx show mermaidx &> /dev/null; then
+                pipx install mermaidx
+            fi
+
+            pipx ensurepath
+            exec "$0"
+            ;;
+        *)
+            echo -e "${YELLOW}Optional Python development setup skipped.${NC}"
+            ;;
+    esac
+else
+    echo -e "${GREEN}[OK]${NC} Optional Python development tools verified."
+fi
+
+exit 0
