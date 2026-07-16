@@ -1,0 +1,62 @@
+graph TD
+    %% Style Definitions
+    classDef hardware fill:#2d3748,stroke:#4a5568,stroke-width:2px,color:#fff;
+    classDef network fill:#2b6cb0,stroke:#3182ce,stroke-width:2px,color:#fff;
+    classDef gcs fill:#2f855a,stroke:#38a169,stroke-width:2px,color:#fff;
+    classDef software fill:#805ad5,stroke:#6b46c1,stroke-width:2px,color:#fff;
+
+    %% Drone Hardware
+    subgraph Drone_Airframe [Drone Airframe Components]
+        Pixhawk[Pixhawk 6C <br> Flight Controller]:::hardware
+        BotBlox[BotBlox DroneNet <br> Ethernet Switch]:::hardware
+        Radio915[915 MHz <br> Backup Telemetry Radio]:::hardware
+        VTX[5.5 GHz VTX <br> Video Transmitter]:::hardware
+    end
+
+    %% Payload
+    subgraph Payload_C12 [Skydroid C12 Payload]
+        C12_Gimbal[C12 Gimbal & Camera]:::hardware
+    end
+
+    %% Raspberry Pi Internal Architecture
+    subgraph RPi5_Companion [Raspberry Pi 5]
+        MavProxy[Internal MAVProxy <br> Router]:::network
+        subgraph Custom_Software_Stack [Custom Pi Software]
+            RTSP_Decoder[GStreamer / FFmpeg <br> Dual RTSP Decoder]:::software
+            Cmd_Translator[Custom Translation Script <br> MAVLink -> C12 Protocol]:::software
+        end
+    end
+
+    %% Communications
+    Knot[MikroTik KNOT <br> LTE4 Global Modem]:::hardware
+    Tailscale[Tailscale VPN <br> Encryption Layer]:::network
+
+    %% Ground Station Hardware
+    subgraph Ground_Control_Station [Ground Control Station]
+        GCS_Laptop[GCS Laptop <br> QGroundControl / Mission Planner]:::gcs
+        GCS_Tailscale[GCS Tailscale / LTE Adapter]:::network
+        GCS_Radio915[915 MHz Ground Radio]:::gcs
+        VRX[5.5 GHz VRX <br> Video Receiver / Monitor]:::gcs
+    end
+
+    %% Connections - Flight Controller & Telemetry Routing
+    Pixhawk -- Ethernet / Serial --> BotBlox
+    BotBlox -- Ethernet --> RPi5_Companion
+    MavProxy -- UDP Packets --> Knot
+    Knot --> Tailscale
+    MavProxy -- Serial Data --> Radio915
+
+    %% Connections - Custom Pi Payload Logic
+    MavProxy -- Internal UDP Stream --> Cmd_Translator
+    Cmd_Translator -- Serial / UART Commands --> C12_Gimbal
+    C12_Gimbal -- "Dual RTSP Streams <br> via Switch/Ethernet" --> RTSP_Decoder
+    RTSP_Decoder -- Hardware HDMI Out --> VTX
+
+    %% Wireless Links to Ground
+    Tailscale -. Cellular Network .-> GCS_Tailscale
+    Radio915 -. 915 MHz RF Link .-> GCS_Radio915
+    VTX -. "5.5 GHz RF Link" .-> VRX
+
+    %% Ground Connections to GCS Laptop
+    GCS_Tailscale --> GCS_Laptop
+    GCS_Radio915 --> GCS_Laptop
