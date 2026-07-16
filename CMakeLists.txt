@@ -19,6 +19,9 @@ add_executable(c12-bridge
 
 target_include_directories(c12-bridge PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/include"
+)
+
+target_include_directories(c12-bridge SYSTEM PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/extern/mavlink"
 )
 
