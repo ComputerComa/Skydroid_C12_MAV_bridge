@@ -1,7 +1,8 @@
 # C12 MAVLink Bridge
 
 Native Linux C++ service that exposes a Skydroid C12 payload as MAVLink camera
-and gimbal components to ArduPilot.
+and gimbal components to ArduPilot. Its first deliverable is a Raspberry Pi
+onboard-computer component connected directly to the flight controller.
 
 ## Planned interfaces
 
@@ -12,8 +13,10 @@ and gimbal components to ArduPilot.
 
 ## Status
 
-Early development. Bench-test C12 UDP commands before connecting the bridge to
-a flight controller.
+Early development. Current work focuses on a bidirectional MAVLink connection
+between the Raspberry Pi and flight controller, followed by onboard-computer
+telemetry. C12 control and video integration will follow when hardware is
+available.
 
 See the [project roadmap](ROADMAP.md) for planned goals and release milestones.
 

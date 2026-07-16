@@ -6,10 +6,17 @@
   How the native generated C headers work, including packing, sending, and parsing MAVLink messages.
 
 - [Heartbeat / Connection Protocol](https://mavlink.io/en/services/heartbeat.html)  
-  Required for component discovery. The C12 bridge will send heartbeats as a camera and gimbal component, normally at 1 Hz.
+  Required for component discovery. Begin with a 1 Hz onboard-computer
+  heartbeat; camera and gimbal heartbeats follow when those components are
+  implemented.
 
 - [MAVLink System and Component ID Assignment](https://mavlink.io/en/services/mavlink_id_assignment.html)  
-  Explains system IDs and component IDs. Your Pi components must use the Pixhawk vehicle's system ID, while camera and gimbal use distinct component IDs.
+  Explains system IDs and component IDs. The Pi onboard computer, camera, and
+  gimbal use distinct component IDs under the Pixhawk vehicle's system ID.
+
+- `ONBOARD_COMPUTER_STATUS` in the generated MAVLink headers
+  Reports measured companion-computer health. Populate only fields the Pi can
+  measure reliably and use the message-defined unknown values for the rest.
 
 - [Command Protocol](https://mavlink.io/en/services/command.html)  
   Covers `COMMAND_LONG`, `COMMAND_INT`, and `COMMAND_ACK`. Both the camera and gimbal bridge need to correctly acknowledge supported commands.

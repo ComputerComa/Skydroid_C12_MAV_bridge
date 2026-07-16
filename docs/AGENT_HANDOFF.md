@@ -27,7 +27,10 @@ MAV_COMP_ID_CAMERA + MAV_TYPE_CAMERA
 MAV_COMP_ID_GIMBAL + MAV_TYPE_GIMBAL
 ```
 
-Both use the aircraft/Pixhawk system ID. A separate `MAV_COMP_ID_ONBOARD_COMPUTER` component is optional and not part of the initial implementation.
+All three components use the aircraft/Pixhawk system ID. The
+`MAV_COMP_ID_ONBOARD_COMPUTER` component represents the Linux bridge itself.
+Start development with its heartbeat, then add the logical camera and gimbal
+components alongside it.
 
 ## Current repository and environment
 
@@ -87,28 +90,23 @@ Avoid large code dumps. Do not assume the user owns the C12 yet; they do not.
 
 ## Current development direction
 
-Do not implement real C12 hardware communication yet.
+The first hardware milestone is a bidirectional MAVLink connection between the
+Raspberry Pi and flight controller over a TELEM UART. The Pi should receive the
+vehicle heartbeat, use the aircraft system ID, advertise itself as
+`MAV_COMP_ID_ONBOARD_COMPUTER`, and send measured onboard-computer telemetry.
 
-The next likely task is to refactor the MAVLink smoke test into a small, understandable module:
-
-```text
-include/c12bridge/mavlink/...
-src/mavlink/...
-src/main.cpp
-```
-
-Then add automated tests using CTest.
+Do not implement real C12 communication until this link works reliably. C12
+control and video may wait until the user obtains the hardware.
 
 Later milestones:
 
-1. Offline C12 packet encoder/checksum module from known reference packets.
-2. Unit tests for C12 packet formatting.
-3. Fake local UDP C12 server.
-4. Raspberry Pi serial transport to Pixhawk.
-5. Real C12 bench control.
-6. MAVLink Camera Protocol v2 implementation.
-7. MAVLink Gimbal Protocol v2 implementation.
-8. RTSP, recording, and later OpenCV/geolocation.
+1. Linux serial transport with pseudo-terminal tests.
+2. Flight-controller heartbeat reception and aircraft system-ID discovery.
+3. Pi heartbeat and `ONBOARD_COMPUTER_STATUS` transmission.
+4. Offline C12 packet encoder/checksum module and tests.
+5. Fake local UDP C12 server, followed by real C12 bench control.
+6. MAVLink Camera Protocol v2 and Gimbal Protocol v2 implementation.
+7. RTSP, recording, and later OpenCV/geolocation.
 
 ## Safety and repository rules
 

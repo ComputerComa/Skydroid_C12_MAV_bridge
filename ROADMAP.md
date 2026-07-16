@@ -16,10 +16,11 @@ For current work and detailed discussion, use
 
 ## Major goals
 
-1. Build a reliable, testable C++ foundation for MAVLink and C12 messaging.
-2. Translate between standard MAVLink camera/gimbal protocols and C12 UDP
+1. Run a reliable MAVLink onboard-computer component on a Raspberry Pi
+   connected to ArduPilot.
+2. Build a reliable, testable C++ foundation for C12 messaging.
+3. Translate between standard MAVLink camera/gimbal protocols and C12 UDP
    commands.
-3. Run the bridge safely and reliably on a Raspberry Pi connected to ArduPilot.
 4. Add video and search-and-rescue features after core control is proven.
 
 ## Milestone 0: Project foundation
@@ -31,14 +32,31 @@ initial MAVLink module.
 - [x] Configure CMake, C++20, compiler warnings, and Ninja builds.
 - [x] Add the official MAVLink C headers.
 - [x] Encode and parse a MAVLink heartbeat in an offline smoke test.
-- [ ] Move MAVLink behavior into `include/c12bridge/mavlink/` and
+- [x] Move MAVLink behavior into `include/c12bridge/mavlink/` and
   `src/mavlink/`.
-- [ ] Add unit tests and register them with CTest.
+- [x] Add unit tests and register them with CTest.
 - [ ] Document local build, test, and contribution workflows.
 
-## Milestone 1: Offline C12 protocol support
+## Milestone 1: Raspberry Pi MAVLink connection and telemetry
 
 **Target:** `v0.2.0`  
+**Outcome:** The Raspberry Pi exchanges MAVLink with the flight controller over
+a TELEM UART and appears as a working onboard-computer component.
+
+- [ ] Add configurable Linux serial transport for device path and baud rate.
+- [ ] Test serial reads and writes offline with a pseudo-terminal.
+- [ ] Receive and decode the flight controller heartbeat.
+- [ ] Determine the aircraft system ID from received MAVLink traffic.
+- [ ] Send a 1 Hz `MAV_COMP_ID_ONBOARD_COMPUTER` heartbeat using the aircraft
+  system ID.
+- [ ] Send `ONBOARD_COMPUTER_STATUS` with values measured on the Raspberry Pi.
+- [ ] Log connection state and received message identities clearly.
+- [ ] Handle shutdown, malformed input, and a disconnected serial link cleanly.
+- [ ] Document TELEM wiring, ArduPilot serial settings, and bench verification.
+
+## Milestone 2: Offline C12 protocol support
+
+**Target:** `v0.3.0`
 **Outcome:** C12 packets can be encoded and validated without camera hardware.
 
 - [ ] Record packet facts separately from unverified protocol hypotheses.
@@ -48,11 +66,11 @@ initial MAVLink module.
 - [ ] Reject invalid sizes, fields, and checksums with useful errors.
 - [ ] Document each supported command and the source of its protocol evidence.
 
-## Milestone 2: Simulated C12 integration
+## Milestone 3: Simulated C12 integration
 
-**Target:** `v0.3.0`  
-**Outcome:** The bridge can exchange commands and responses with a local fake
-C12 endpoint.
+**Target:** `v0.4.0`
+**Outcome:** The bridge exchanges commands and responses with a local fake C12
+endpoint.
 
 - [ ] Add a UDP transport module with configurable addresses and ports.
 - [ ] Build a fake local UDP C12 server for repeatable development.
@@ -60,26 +78,15 @@ C12 endpoint.
 - [ ] Add integration tests that require no physical hardware.
 - [ ] Add structured, readable diagnostic logging.
 
-## Milestone 3: Pixhawk transport and MAVLink components
-
-**Target:** `v0.4.0`  
-**Outcome:** The Raspberry Pi communicates with a Pixhawk and advertises the C12
-as standard MAVLink camera and gimbal components.
-
-- [ ] Add configurable Linux serial transport for a Pixhawk TELEM port.
-- [ ] Use the aircraft system ID for both logical components.
-- [ ] Advertise `MAV_COMP_ID_CAMERA` with `MAV_TYPE_CAMERA`.
-- [ ] Advertise `MAV_COMP_ID_GIMBAL` with `MAV_TYPE_GIMBAL`.
-- [ ] Send component heartbeats and handle MAVLink routing correctly.
-- [ ] Add clean startup, shutdown, reconnect, and error behavior.
-- [ ] Document Raspberry Pi serial setup and bench wiring.
-
 ## Milestone 4: Camera Protocol v2
 
 **Target:** `v0.5.0`  
 **Outcome:** ArduPilot and compatible ground stations can discover and control
 the supported C12 camera functions through MAVLink.
 
+- [ ] Use the aircraft system ID for the logical camera component.
+- [ ] Advertise `MAV_COMP_ID_CAMERA` with `MAV_TYPE_CAMERA`.
+- [ ] Send camera heartbeats and handle MAVLink routing correctly.
 - [ ] Publish camera information and capabilities.
 - [ ] Implement command handling and `COMMAND_ACK` responses.
 - [ ] Translate supported capture, recording, zoom, and mode commands.
@@ -94,6 +101,9 @@ the supported C12 camera functions through MAVLink.
 **Outcome:** ArduPilot can discover, command, and monitor the C12 as a MAVLink
 Gimbal Device.
 
+- [ ] Use the aircraft system ID for the logical gimbal component.
+- [ ] Advertise `MAV_COMP_ID_GIMBAL` with `MAV_TYPE_GIMBAL`.
+- [ ] Send gimbal heartbeats and handle MAVLink routing correctly.
 - [ ] Publish `GIMBAL_DEVICE_INFORMATION`.
 - [ ] Handle `GIMBAL_DEVICE_SET_ATTITUDE`.
 - [ ] Publish `GIMBAL_DEVICE_ATTITUDE_STATUS`.
@@ -132,6 +142,8 @@ not have release targets yet.
 
 - Real C12 control work begins only after commands are supported by public
   documentation, observed behavior, or user-provided legal artifacts.
+- C12 implementation and video work follow a verified Raspberry Pi-to-flight-
+  controller MAVLink connection and may wait until C12 hardware is available.
 - The generated official MAVLink C headers remain the source of truth for
   MAVLink serialization and parsing.
 - RTSP, OpenCV, geolocation, and ADS-B features must not delay the core camera

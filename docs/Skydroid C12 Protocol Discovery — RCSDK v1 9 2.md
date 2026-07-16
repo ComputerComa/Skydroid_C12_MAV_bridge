@@ -265,10 +265,6 @@ Yaw and combined yaw/pitch only apply it once. This may be:
 
 Do not implement double checksums until a real C12 packet capture or controlled bench test confirms it. Compare behavior against the independent Python driver.
 
-# Teensy 4.1 implementation impact
-
-This route has been depricated in favor of a single RPI4B target that exposes both the Mavlink Camera V2 and Mavlink Gimbal V2
-
 ## Recommended firmware layers
 
 1. `C12Protocol`
