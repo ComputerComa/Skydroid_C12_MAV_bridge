@@ -15,6 +15,8 @@ and gimbal components to ArduPilot.
 Early development. Bench-test C12 UDP commands before connecting the bridge to
 a flight controller.
 
+See the [project roadmap](ROADMAP.md) for planned goals and release milestones.
+
 ## Development
 
 - Host development: Debian WSL2

@@ -1,13 +1,10 @@
 # Skydroid C12 Protocol Discovery — RCSDK v1.9.2
 
 > **Status:** Major protocol discovery from decompiling Skydroid RCSDK v1.9.2 on July 15, 2026.
-> 
 
-> 
-> 
+>
 
 > The SDK contains readable, C12-specific implementations for gimbal movement, camera control, thermal settings, telemetry parsing, UDP transport, and checksum generation. This materially reduces the amount of blind reverse engineering required for the Teensy 4.1 MAVLink-to-C12 bridge.
-> 
 
 # Executive summary
 
@@ -29,12 +26,12 @@
 - Input: `rcsdk-v1.9.2.aar`
 - Local JADX export: `C:\Users\ComputerComa\Downloads\RCSDK-deco`
 - Key classes:
-    - `com.skydroid.rcsdk.common.payload.C12`
-    - `com.skydroid.rcsdk.internal.payload.SkydroidGimbalControlCore`
-    - `com.skydroid.rcsdk.internal.payload.TopCameraCore`
-    - `com.skydroid.rcsdk.internal.payload.TopParser`
-    - `com.skydroid.rcsdk.common.pipeline.UDPPipeline`
-    - `com.skydroid.rcsdk.PayloadManager`
+  - `com.skydroid.rcsdk.common.payload.C12`
+  - `com.skydroid.rcsdk.internal.payload.SkydroidGimbalControlCore`
+  - `com.skydroid.rcsdk.internal.payload.TopCameraCore`
+  - `com.skydroid.rcsdk.internal.payload.TopParser`
+  - `com.skydroid.rcsdk.common.pipeline.UDPPipeline`
+  - `com.skydroid.rcsdk.PayloadManager`
 
 ## Independent protocol reference
 
@@ -80,26 +77,26 @@ String finalizeCommand(const String& body, bool appendCrlf = false)
 
 # Confirmed camera command bodies
 
-| Function | Command body |
-| --- | --- |
-| Take picture | `#TPUD2wCAP01` |
-| Start recording | `#TPUD2wREC01` |
-| Stop recording | `#TPUD2wREC00` |
-| Read recording state | `#TPUD2rREC00` |
-| Read camera version | `#TPUD2rVER00` |
-| Read camera model | `#TPUD2rMOD00` |
-| Read SD-card capacity | `#TPUD2rSDC01` |
-| Factory reset | `#TPUD2wRTF01` |
-| Zoom in one step | `#TPUD2wDZM0A` |
-| Zoom out one step | `#TPUD2wDZM0B` |
-| Read zoom | `#TPUD2rDZM00` |
-| Select telephoto lens | `#TPUD2wDZM0C` |
-| Select alternate lens | `#TPUD2wDZM0D` |
-| Read thermal palette | `#TPUD2rIMG00` |
+| Function                | Command body   |
+| ----------------------- | -------------- |
+| Take picture            | `#TPUD2wCAP01` |
+| Start recording         | `#TPUD2wREC01` |
+| Stop recording          | `#TPUD2wREC00` |
+| Read recording state    | `#TPUD2rREC00` |
+| Read camera version     | `#TPUD2rVER00` |
+| Read camera model       | `#TPUD2rMOD00` |
+| Read SD-card capacity   | `#TPUD2rSDC01` |
+| Factory reset           | `#TPUD2wRTF01` |
+| Zoom in one step        | `#TPUD2wDZM0A` |
+| Zoom out one step       | `#TPUD2wDZM0B` |
+| Read zoom               | `#TPUD2rDZM00` |
+| Select telephoto lens   | `#TPUD2wDZM0C` |
+| Select alternate lens   | `#TPUD2wDZM0D` |
+| Read thermal palette    | `#TPUD2rIMG00` |
 | Read thermal scene mode | `#TPUD2rTSM00` |
-| Read camera IP | `#TPUD2rIPV00` |
-| Read gateway | `#TPUD2rGTW00` |
-| Reboot camera | `#TPUD2wRST00` |
+| Read camera IP          | `#TPUD2rIPV00` |
+| Read gateway            | `#TPUD2rGTW00` |
+| Reboot camera           | `#TPUD2wRST00` |
 
 Append the checksum to each body. Commands expecting replies are sent with `\r\n` after the checksum.
 
@@ -111,19 +108,19 @@ Palette selection uses:
 #TPUD2wIMGxx
 ```
 
-| Palette | Value |
-| --- | --- |
-| White hot | `01` |
-| Sepia | `03` |
-| Ironbow | `04` |
-| Rainbow | `05` |
-| Night | `06` |
-| Aurora | `07` |
-| Red hot | `08` |
-| Jungle | `09` |
-| Medical | `0A` |
-| Black hot | `0B` |
-| Glory hot | `0C` |
+| Palette   | Value |
+| --------- | ----- |
+| White hot | `01`  |
+| Sepia     | `03`  |
+| Ironbow   | `04`  |
+| Rainbow   | `05`  |
+| Night     | `06`  |
+| Aurora    | `07`  |
+| Red hot   | `08`  |
+| Jungle    | `09`  |
+| Medical   | `0A`  |
+| Black hot | `0B`  |
+| Glory hot | `0C`  |
 
 Example body for Ironbow:
 
@@ -135,47 +132,47 @@ Example body for Ironbow:
 
 Scene selection uses `#TPUD2wTSMxx`.
 
-| Scene | Value |
-| --- | --- |
-| Default | `00` |
-| Patrol | `01` |
-| Manual | `02` |
-| Low temperature | `03` |
-| Linear | `04` |
-| Low contrast | `05` |
-| High contrast | `06` |
-| Highlight | `07` |
-| Rescue | `0C` |
-| Urban | `0D` |
-| Temperature measurement | `0E` |
-| Outdoors | `0F` |
+| Scene                   | Value |
+| ----------------------- | ----- |
+| Default                 | `00`  |
+| Patrol                  | `01`  |
+| Manual                  | `02`  |
+| Low temperature         | `03`  |
+| Linear                  | `04`  |
+| Low contrast            | `05`  |
+| High contrast           | `06`  |
+| Highlight               | `07`  |
+| Rescue                  | `0C`  |
+| Urban                   | `0D`  |
+| Temperature measurement | `0E`  |
+| Outdoors                | `0F`  |
 
 # Other confirmed thermal controls
 
-| Function | Write prefix | Read command |
-| --- | --- | --- |
-| Thermal shutter | `#TPUD2wTAS` | `#TPUD2rTAS00` |
-| Detail enhancement | `#TPUD2wTDI` | `#TPUD2rTDI00` |
-| Brightness | `#TPUD2wTIB` | `#TPUD2rTIB00` |
-| Contrast | `#TPUD2wTIC` | `#TPUD2rTIC00` |
-| Spatial noise reduction | `#TPUD2wTAR` | `#TPUD2rTAR00` |
+| Function                 | Write prefix | Read command   |
+| ------------------------ | ------------ | -------------- |
+| Thermal shutter          | `#TPUD2wTAS` | `#TPUD2rTAS00` |
+| Detail enhancement       | `#TPUD2wTDI` | `#TPUD2rTDI00` |
+| Brightness               | `#TPUD2wTIB` | `#TPUD2rTIB00` |
+| Contrast                 | `#TPUD2wTIC` | `#TPUD2rTIC00` |
+| Spatial noise reduction  | `#TPUD2wTAR` | `#TPUD2rTAR00` |
 | Temporal noise reduction | `#TPUD2wTTR` | `#TPUD2rTTR00` |
-| Gamma | `#TPUD2wTGM` | `#TPUD2rTGM00` |
+| Gamma                    | `#TPUD2wTGM` | `#TPUD2rTGM00` |
 
 Numeric write values are converted to hexadecimal by the SDK. Valid ranges should be extracted and bench-verified before exposing them to operators.
 
 # Confirmed gimbal command structures
 
-| Function | Command body structure |
-| --- | --- |
-| Yaw rate | `#TPUG2wGSYxx` |
-| Pitch rate | `#TPUG2wGSPxx` |
-| Combined yaw/pitch rate | `#TPUG4wGSMxxyy` |
-| Absolute yaw | `#TPUG6wGAYaaaa10` |
-| Absolute pitch | `#TPUG6wGAPaaaa10` |
-| Absolute roll | `#TPUG6wGARaaaa10` |
-| Absolute yaw/pitch | `#TPUGCwGAMaaaa10bbbb10` |
-| Configure attitude push rate | `#TPUG2wGAAxx` |
+| Function                     | Command body structure   |
+| ---------------------------- | ------------------------ |
+| Yaw rate                     | `#TPUG2wGSYxx`           |
+| Pitch rate                   | `#TPUG2wGSPxx`           |
+| Combined yaw/pitch rate      | `#TPUG4wGSMxxyy`         |
+| Absolute yaw                 | `#TPUG6wGAYaaaa10`       |
+| Absolute pitch               | `#TPUG6wGAPaaaa10`       |
+| Absolute roll                | `#TPUG6wGARaaaa10`       |
+| Absolute yaw/pitch           | `#TPUGCwGAMaaaa10bbbb10` |
+| Configure attitude push rate | `#TPUG2wGAAxx`           |
 
 ## Rate encoding
 
@@ -270,51 +267,39 @@ Do not implement double checksums until a real C12 packet capture or controlled 
 
 # Teensy 4.1 implementation impact
 
-This discovery validates the proposed Teensy bridge architecture:
-
-```
-Pixhawk 6C TELEM UART
-  -> MAVLink 2
-  -> Teensy 4.1
-  -> C12 command translation
-  -> Teensy Ethernet adapter and magnetics
-  -> SwitchBlox for ArduPilot
-  -> Skydroid C12
-```
-
-The initial Teensy firmware no longer needs to begin with blind protocol discovery.
+This route has been depricated in favor of a single RPI4B target that exposes both the Mavlink Camera V2 and Mavlink Gimbal V2
 
 ## Recommended firmware layers
 
 1. `C12Protocol`
-    - Checksum generation
-    - Signed integer encoding
-    - Command construction
-    - Response framing and parsing
+   - Checksum generation
+   - Signed integer encoding
+   - Command construction
+   - Response framing and parsing
 2. `C12UdpTransport`
-    - Static network configuration
-    - UDP send/receive
-    - Timeouts
-    - Connection health
+   - Static network configuration
+   - UDP send/receive
+   - Timeouts
+   - Connection health
 3. `C12Gimbal`
-    - Rate commands
-    - Absolute angles
-    - Modes, center, calibration
-    - Attitude telemetry
+   - Rate commands
+   - Absolute angles
+   - Modes, center, calibration
+   - Attitude telemetry
 4. `C12Camera`
-    - Photo and recording
-    - Zoom and lens selection
-    - Thermal palette and scene settings
+   - Photo and recording
+   - Zoom and lens selection
+   - Thermal palette and scene settings
 5. `SerialCommandShell`
-    - Early bench testing without MAVLink
+   - Early bench testing without MAVLink
 6. `MavlinkGimbalDevice`
-    - ArduPilot Gimbal Device v2 translation
-    - Heartbeats, information, status, commands, and acknowledgements
+   - ArduPilot Gimbal Device v2 translation
+   - Heartbeats, information, status, commands, and acknowledgements
 7. `SafetySupervisor`
-    - Command timeout
-    - Explicit zero-rate stop
-    - Startup inhibition
-    - Ethernet/UART watchdogs
+   - Command timeout
+   - Explicit zero-rate stop
+   - Startup inhibition
+   - Ethernet/UART watchdogs
 
 # First bench-test command shell
 
@@ -344,26 +329,26 @@ This proves the C12 transport and protocol independently of ArduPilot and MAVLin
 
 # Verification plan
 
-- [ ]  Power the C12 through its protected/fused payload branch.
-- [ ]  Connect the C12 and Teensy through SwitchBlox.
-- [ ]  Configure the Teensy on the `192.168.144.0/24` subnet.
-- [ ]  Verify Ethernet link and ARP visibility.
-- [ ]  Test UDP port `12580`.
-- [ ]  Test the independently reported gimbal UDP port `5000`.
-- [ ]  Send a harmless version/model query before movement commands.
-- [ ]  Verify the checksum implementation.
-- [ ]  Send center and explicit zero-rate commands.
-- [ ]  Test conservative pitch/yaw rate commands.
-- [ ]  Validate absolute-angle encoding and axis signs.
-- [ ]  Determine whether pitch/roll require one or two checksum applications.
-- [ ]  Enable attitude telemetry and determine axis ordering.
-- [ ]  Test photo and recording controls.
-- [ ]  Test visible/thermal lens switching.
-- [ ]  Test multiple thermal palettes.
-- [ ]  Verify thermal-setting ranges.
-- [ ]  Capture all successful transactions with Wireshark.
-- [ ]  Compare SDK-generated traffic, Python-driver traffic, and Teensy traffic.
-- [ ]  Write a clean, verified C12 protocol specification before MAVLink integration.
+- [ ] Power the C12 through its protected/fused payload branch.
+- [ ] Connect the C12 and Teensy through SwitchBlox.
+- [ ] Configure the Teensy on the `192.168.144.0/24` subnet.
+- [ ] Verify Ethernet link and ARP visibility.
+- [ ] Test UDP port `12580`.
+- [ ] Test the independently reported gimbal UDP port `5000`.
+- [ ] Send a harmless version/model query before movement commands.
+- [ ] Verify the checksum implementation.
+- [ ] Send center and explicit zero-rate commands.
+- [ ] Test conservative pitch/yaw rate commands.
+- [ ] Validate absolute-angle encoding and axis signs.
+- [ ] Determine whether pitch/roll require one or two checksum applications.
+- [ ] Enable attitude telemetry and determine axis ordering.
+- [ ] Test photo and recording controls.
+- [ ] Test visible/thermal lens switching.
+- [ ] Test multiple thermal palettes.
+- [ ] Verify thermal-setting ranges.
+- [ ] Capture all successful transactions with Wireshark.
+- [ ] Compare SDK-generated traffic, Python-driver traffic, and Teensy traffic.
+- [ ] Write a clean, verified C12 protocol specification before MAVLink integration.
 
 # Safety rules
 
