@@ -1,0 +1,31 @@
+# CMake and compilation output
+/build/
+/out/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+compile_commands.json
+CTestTestfile.cmake
+Testing/
+
+# IDE state
+.vscode/
+.idea/
+.vs/
+
+# Local user settings and secrets
+CMakeUserPresets.json
+*.local.yaml
+*.local.json
+.env
+
+# Runtime output
+*.log
+*.tlog
+*.pcap
+*.pcapng
+/captures/
+
+# OS files
+.DS_Store
+Thumbs.db
