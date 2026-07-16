@@ -26,3 +26,6 @@ See the [project roadmap](ROADMAP.md) for planned goals and release milestones.
 - Target hardware: Raspberry Pi 4 / Raspberry Pi OS 64-bit
 - Build system: CMake + Ninja
 - MAVLink: official `c_library_v2` Git submodule
+
+See [Debian development packages](docs/debian-packages.md) for installation,
+source preparation, build, and test commands.
