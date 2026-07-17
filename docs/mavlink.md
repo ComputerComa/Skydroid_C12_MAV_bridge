@@ -24,7 +24,7 @@
 ## C12 camera component
 
 - [Camera Protocol v2](https://mavlink.io/en/services/camera.html)  
-  The primary specification for advertising the C12 as a MAVLink camera, reporting its capabilities, RTSP streams, video-recording state, capture events, zoom, and camera configuration.
+  The primary specification for advertising the C12 as a MAVLink camera, reporting its capabilities, RTSP stream metadata/URIs, video-recording state, capture events, zoom, and camera configuration. MAVLink describes and controls streams; it does not carry the video payload. Visible and thermal video remain independent RTSP traffic over Ethernet.
 
 - [Camera Definition Files](https://mavlink.io/en/services/camera_def.html)  
   Optional later work. A camera-definition XML file can let a ground station generate a configuration interface for C12-specific settings such as thermal palette, zoom, or image mode.

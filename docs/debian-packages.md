@@ -1,8 +1,8 @@
 # Debian development packages
 
 This project currently builds with the standard GNU C++ toolchain, CMake, and
-Ninja. The MAVLink C library is header-only and is included as a Git submodule,
-so it does not require a separate Debian package.
+Ninja. The full MAVLink source repository is included as a Git submodule. CMake
+uses its pinned pymavlink generator to build the C headers from XML definitions.
 
 These instructions apply to Debian 12, Debian WSL2, and Raspberry Pi OS
 Bookworm.
@@ -18,7 +18,9 @@ sudo apt install --yes \
     ca-certificates \
     cmake \
     git \
-    ninja-build
+    ninja-build \
+    python3 \
+    python3-lxml
 ```
 
 The packages provide:
@@ -29,6 +31,9 @@ The packages provide:
 - `cmake`: generates the project build files and registers the tests.
 - `git`: obtains the repository and its MAVLink submodule.
 - `ninja-build`: performs fast incremental builds from CMake's Ninja files.
+- `python3`: runs MAVLink's C-header and Wireshark Lua generators.
+- `python3-lxml`: validates MAVLink XML definitions against their schema during
+  generation.
 
 The project requires CMake 3.25 or newer and a compiler with C++20 support.
 
@@ -73,7 +78,8 @@ sudo apt install -y \
 
 ## Prepare the source tree
 
-After cloning the repository, initialize the official MAVLink headers:
+After cloning the repository, initialize the full MAVLink repository and its
+nested pymavlink generator submodule:
 
 ```bash
 git submodule update --init --recursive
@@ -89,6 +95,26 @@ cmake --build build/debug
 ctest --test-dir build/debug --output-on-failure
 ./build/debug/c12-bridge
 ```
+
+CMake generates the `ardupilotmega` MAVLink 2 C headers under
+`build/debug/generated/mavlink` as part of a normal build.
+
+## Wireshark Lua dissector
+
+Generate a Lua dissector from the same pinned MAVLink definitions:
+
+```bash
+cmake --build build/debug --target mavlink-wireshark
+```
+
+The generated file is:
+
+```text
+build/debug/generated/wireshark/mavlink.lua
+```
+
+The build does not install the dissector automatically because Wireshark plugin
+locations vary by platform and version.
 
 No C12 camera, Pixhawk, serial connection, or network access is required for
 the current automated test.

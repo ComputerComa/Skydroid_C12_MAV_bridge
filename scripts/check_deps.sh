@@ -18,11 +18,12 @@ OPTIONAL_MISSING=0
 CLI_DEPS=(
     "gcc" "g++" "clang" "clang-format" "clang-tidy" 
     "cppcheck" "cmake" "ninja" "pkg-config" "git" 
-    "gdb" "gdbserver" "ssh-add" "rsync"
+    "gdb" "gdbserver" "ssh-add" "rsync" "python3"
 )
 
 LIB_DEPS=(
     "build-essential"
+    "python3-lxml"
     "libsystemd-dev" 
     "libgstreamer1.0-dev" 
     "libgstreamer-plugins-base1.0-dev"
@@ -48,14 +49,13 @@ for lib in "${LIB_DEPS[@]}"; do
     fi
 done
 
-# 3. Structural Validation for MAVLink Submodule Headers
-# This is the dialect header included by the bridge source code.
-MAVLINK_HEADER_PATH="$REPO_ROOT/extern/mavlink/ardupilotmega/mavlink.h"
-if [ ! -f "$MAVLINK_HEADER_PATH" ]; then
-    echo -e "${YELLOW}[MISSING]${NC} Submodule: MAVLink headers missing at $MAVLINK_HEADER_PATH"
+# 3. Structural Validation for MAVLink Generator Sources
+MAVLINK_GENERATOR_PATH="$REPO_ROOT/extern/mavlink/pymavlink/tools/mavgen.py"
+if [ ! -f "$MAVLINK_GENERATOR_PATH" ]; then
+    echo -e "${YELLOW}[MISSING]${NC} Submodule: MAVLink generator missing at $MAVLINK_GENERATOR_PATH"
     FAILED=1
 else
-    echo -e "${GREEN}[OK]${NC} Submodule: MAVLink ArduPilotMega header detected"
+    echo -e "${GREEN}[OK]${NC} Submodule: full MAVLink repository and generator detected"
 fi
 
 # 4. Optional Python Development Tools
@@ -111,12 +111,12 @@ if [ $FAILED -ne 0 ]; then
                 sudo apt install -y \
                     build-essential gcc g++ clang clang-format clang-tidy \
                     cppcheck cmake ninja-build pkg-config git gdb gdbserver \
-                    openssh-client rsync python3 python3-pip libsystemd-dev \
+                    openssh-client rsync python3 python3-lxml python3-pip libsystemd-dev \
                     libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
             fi
 
-            # Fetch the submodule if the header used by this project is missing.
-            if [ ! -f "$MAVLINK_HEADER_PATH" ]; then
+            # Fetch the full MAVLink repository and its nested generator.
+            if [ ! -f "$MAVLINK_GENERATOR_PATH" ]; then
                 echo "Initializing Git submodules..."
                 git -C "$REPO_ROOT" submodule update --init --recursive
             fi

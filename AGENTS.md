@@ -9,7 +9,13 @@ The Raspberry Pi is the translator between:
 
 - Pixhawk MAVLink over a TELEM UART
 - Skydroid C12 proprietary camera and gimbal commands over Ethernet/UDP
-- C12 RTSP video streams at a later stage
+- C12 RTSP video streams over a separate media path at a later stage
+
+MAVLink is strictly the command, control, status, and metadata plane. Never
+place, tunnel, packetize, or proxy video payload data through MAVLink. Camera
+Protocol stream messages may describe a stream or provide its URI, but the
+visible and thermal video data remains RTSP over Ethernet and follows the route
+documented in `docs/proposed_path.png` and `docs/proposed_pathing.mmd`.
 
 Represent the C12 using logical `MAV_COMP_ID_CAMERA`/`MAV_TYPE_CAMERA` and
 `MAV_COMP_ID_GIMBAL`/`MAV_TYPE_GIMBAL` components. Both use the aircraft's
@@ -49,8 +55,9 @@ Prefer this progression:
 
 ## Build and verify
 
-The expected development toolchain is CMake, Ninja, GCC/G++, and the official
-MAVLink C headers in `extern/mavlink`.
+The expected development toolchain is CMake, Ninja, GCC/G++, Python 3, and the
+full official MAVLink repository in `extern/mavlink`. CMake generates MAVLink C
+headers under the selected build directory.
 
 ```bash
 cmake -S . -B build/debug -G Ninja -DCMAKE_BUILD_TYPE=Debug

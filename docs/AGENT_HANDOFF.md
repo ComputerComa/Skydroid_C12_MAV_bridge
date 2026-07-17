@@ -18,7 +18,15 @@ The Raspberry Pi will translate:
 
 - MAVLink Camera Protocol v2 <-> C12 proprietary UDP camera commands
 - MAVLink Gimbal Protocol v2 <-> C12 proprietary UDP gimbal commands
-- C12 RTSP streams will be handled later
+- C12 visible and thermal RTSP streams will be handled later on an independent
+  media path
+
+**Video does not travel through MAVLink.** MAVLink carries payload commands,
+status, and stream metadata only. The actual C12 video remains RTSP over
+Ethernet, is decoded independently by GStreamer/FFmpeg on the Raspberry Pi, and
+is sent over HDMI to the 5.5 GHz video transmitter. The authoritative proposed
+routing is illustrated in [`proposed_path.png`](proposed_path.png), generated
+from [`proposed_pathing.mmd`](proposed_pathing.mmd).
 
 The Pi is the host/translator. The C12 is represented as logical MAVLink components:
 
@@ -48,7 +56,8 @@ Toolchain already installed and working:
 - Ninja 1.12
 - Git
 - VS Code Remote WSL
-- Official MAVLink `c_library_v2` headers under `extern/mavlink`
+- Official full MAVLink repository under `extern/mavlink`, including its pinned
+  `pymavlink` generator submodule
 
 Current live development is on Debian 13 under WSL2. A Pixhawk 6C connected to
 Windows through USB is bridged by MAVProxy to the WSL process over UDP port
@@ -57,6 +66,16 @@ discovers aircraft system ID 1 and advertises component
 `MAV_COMP_ID_ONBOARD_COMPUTER` on that system. The bridge also sends measured
 Linux `ONBOARD_COMPUTER_STATUS` values for uptime, per-core CPU load, RAM, and
 root-filesystem usage. Raspberry Pi and TELEM-UART behavior remain unverified.
+
+The UDP executable accepts `[TARGET_IP] [TARGET_PORT]`, defaulting to
+`127.0.0.1 14551`. Its non-blocking UDP manager first binds the target port
+locally and falls back to a logged Linux-assigned ephemeral port only when the
+target port is already in use. The manager transmits a system ID 1, component
+ID 191 onboard-computer heartbeat at 1 Hz independently of received traffic.
+Application code uses the manager's generic frame sender to publish measured
+Linux `ONBOARD_COMPUTER_STATUS` at 1 Hz on the same schedule. Complete incoming
+MAVLink messages are delivered to an application callback; the current callback
+reports heartbeats whose `autopilot` field is not `MAV_AUTOPILOT_INVALID`.
 
 The project currently builds successfully with:
 
@@ -99,9 +118,10 @@ Avoid large code dumps. Do not assume the user owns the C12 yet; they do not.
 ## Current development direction
 
 The first hardware milestone is a bidirectional MAVLink connection between the
-Raspberry Pi and flight controller over a TELEM UART. The Pi should receive the
-vehicle heartbeat, use the aircraft system ID, advertise itself as
-`MAV_COMP_ID_ONBOARD_COMPUTER`, and send measured onboard-computer telemetry.
+Raspberry Pi and flight controller over a TELEM UART. The Pi advertises itself
+as `MAV_COMP_ID_ONBOARD_COMPUTER` and sends measured telemetry whether or not a
+flight controller is connected. A valid autopilot heartbeat updates the system
+ID but does not start or stop transmission.
 
 Do not implement real C12 communication until this link works reliably. C12
 control and video may wait until the user obtains the hardware.
@@ -115,6 +135,10 @@ Later milestones:
 5. Fake local UDP C12 server, followed by real C12 bench control.
 6. MAVLink Camera Protocol v2 and Gimbal Protocol v2 implementation.
 7. RTSP, recording, and later OpenCV/geolocation.
+
+Item 7 is a separate media pipeline. It must not be implemented as MAVLink
+payload transport; MAVLink integration may expose only stream discovery,
+control, and status metadata.
 
 ## Safety and repository rules
 
